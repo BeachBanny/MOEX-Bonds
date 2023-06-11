@@ -50,6 +50,8 @@
       <li> <a href="#tab2" data-toggle="tab">Emitents</a> </li>
       <li> <a href="#tab3" data-toggle="tab">Broker1</a> </li>
       <li> <a href="#tab4" data-toggle="tab">Broker2</a> </li>
+      <li> <a href="#tab5" data-toggle="tab">Broker3</a> </li>
+      <li> <a href="#tab6" data-toggle="tab">Broker4</a> </li>
       <li> <a href="#tab7" data-toggle="tab">Emitent %</a> </li>
     </ul>
     <div class="tab-content">
@@ -194,6 +196,47 @@
         <table id="br_brok2" class="display compact table-bordered" width="95%" cellspacing="0"></table>
       </div>
 
+      <div class="tab-pane" id="tab5">
+        <br>
+        <div>
+          Toggle column: 
+              <a class="brok3-toggle-vis" data-column="0">Acc</a> 
+              --<a class="brok3-toggle-vis" data-column="1">Эмитент</a> 
+              --<a class="brok3-toggle-vis" data-column="8">SecID</a> 
+              --<a class="brok3-toggle-vis" data-column="9">Board</a> 
+            </div>
+        <div style="display:flex; flex-direction:row;" >
+          <button id="brok3_row_add" type="button" class="btn" style="width:150px;margin-left:40px;">
+            Add Row 
+          </button>
+          <button id="brok3_row_del" type="button" class="btn" style="width:150px;margin-left:40px;">
+            Del Selected Row 
+          </button>
+          <span>&nbsp;&nbsp;&nbsp;Double click for Edit</span>
+        </div>
+        <table id="br_brok3" class="display compact table-bordered" width="95%" cellspacing="0"></table>
+      </div>
+
+      <div class="tab-pane" id="tab6">
+        <br>
+        <div>
+          Toggle column: 
+              <a class="brok4-toggle-vis" data-column="0">Acc</a> 
+              --<a class="brok4-toggle-vis" data-column="1">Эмитент</a> 
+              --<a class="brok4-toggle-vis" data-column="8">SecID</a> 
+              --<a class="brok4-toggle-vis" data-column="9">Board</a> 
+            </div>
+        <div style="display:flex; flex-direction:row;" >
+          <button id="brok4_row_add" type="button" class="btn" style="width:150px;margin-left:40px;">
+            Add Row 
+          </button>
+          <button id="brok4_row_del" type="button" class="btn" style="width:150px;margin-left:40px;">
+            Del Selected Row 
+          </button>
+          <span>&nbsp;&nbsp;&nbsp;Double click for Edit</span>
+        </div>
+        <table id="br_brok4" class="display compact table-bordered" width="95%" cellspacing="0"></table>
+      </div>
 
       <div class="tab-pane" id="tab7">
         <br>

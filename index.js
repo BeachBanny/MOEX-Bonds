@@ -10,6 +10,14 @@
       "id": 2,
       "name": "Брокер 2"
     },
+    "3": {
+      "id": 3,
+      "name": "Брокер 3"
+    },
+    "4": {
+      "id": 4,
+      "name": "Брокер 4"
+    },
   }
   
   var g_emitents_ui = null;
@@ -45,6 +53,8 @@
 
   var g_brok1_ui = null;
   var g_brok2_ui = null;
+  var g_brok3_ui = null;
+  var g_brok4_ui = null;
   
   var g_tb_proc_emi_ui = null;
 
@@ -63,6 +73,10 @@
     DOM.iSel("brok1_row_add").onclick = (e) =>{ if (g_brok1_ui) g_brok1_ui.row_add_ui(); }; 
     DOM.iSel("brok2_row_del").onclick = (e) =>{ if (g_brok2_ui) g_brok2_ui.row_del_ui(); }; 
     DOM.iSel("brok2_row_add").onclick = (e) =>{ if (g_brok2_ui) g_brok2_ui.row_add_ui(); }; 
+    DOM.iSel("brok3_row_del").onclick = (e) =>{ if (g_brok3_ui) g_brok3_ui.row_del_ui(); }; 
+    DOM.iSel("brok3_row_add").onclick = (e) =>{ if (g_brok3_ui) g_brok3_ui.row_add_ui(); }; 
+    DOM.iSel("brok4_row_del").onclick = (e) =>{ if (g_brok4_ui) g_brok4_ui.row_del_ui(); }; 
+    DOM.iSel("brok4_row_add").onclick = (e) =>{ if (g_brok4_ui) g_brok4_ui.row_add_ui(); }; 
 
     DOM.qSel('#emi_data').onchange = async (e) => {
       if (e.target.files.length > 0) {
@@ -153,6 +167,24 @@
       }
     });
 
+    $('a.brok3-toggle-vis').on('click', function (e) {
+      e.preventDefault();
+
+      if (g_brok3_ui) {
+        const colNum = $(this).attr('data-column');
+        g_brok3_ui.toggle_col(colNum);
+      }
+    });
+
+    $('a.brok4-toggle-vis').on('click', function (e) {
+      e.preventDefault();
+
+      if (g_brok4_ui) {
+        const colNum = $(this).attr('data-column');
+        g_brok4_ui.toggle_col(colNum);
+      }
+    });
+
 
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
         $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
@@ -190,6 +222,16 @@
     g_brok2_ui.use_selected = true;
     g_brok2_ui.use_edit = true;
     await g_brok2_ui.init_table();
+
+    g_brok3_ui = new MyBonds_brok3();
+    g_brok3_ui.use_selected = true;
+    g_brok3_ui.use_edit = true;
+    await g_brok3_ui.init_table();
+
+    g_brok4_ui = new MyBonds_brok4();
+    g_brok4_ui.use_selected = true;
+    g_brok4_ui.use_edit = true;
+    await g_brok4_ui.init_table();
 
     g_tb_proc_emi_ui = new Proc_Emi_Table();
     g_tb_proc_emi_ui.use_selected = true;
@@ -433,6 +475,8 @@
         { title: 'Proc%'},
         { title: 'Брокер1'},
         { title: 'Брокер2'},
+        { title: 'Брокер3'},
+        { title: 'Брокер4'},
       ];
       const colDefs = [
         { "width": "400px", "targets": 0 },
@@ -440,6 +484,8 @@
         { targets: 3, className: 'dt-body-right' },
         { targets: 4, className: 'dt-body-right' },
         { targets: 5, className: 'dt-body-right' },
+        { targets: 6, className: 'dt-body-right' },
+        { targets: 7, className: 'dt-body-right' },
         { targets: [1], orderData: [1, 0], },        
       ];
 
@@ -454,7 +500,7 @@
       super.init_table();
       this.load_mybonds();
 
-      for(var b of [1,2])  //brokers
+      for(var b of [1,2,3,4])  //brokers
       {
         const bonds = this.mybonds[b];
         if (!bonds)
@@ -472,7 +518,7 @@
           const name = g_emitents_ui.get_Name(emitent_id);
 
           if (!lst[emitent_id])
-            lst[emitent_id] = {emitent_id, name, kr, 'sum':0.0, 'count':0, 'proc':0.0, 'br_1':0.0, 'br_2':0.0};
+            lst[emitent_id] = {emitent_id, name, kr, 'sum':0.0, 'count':0, 'proc':0.0, 'br_1':0.0, 'br_2':0.0, 'br_3':0.0, 'br_4':0.0};
 
           var VV = lst[emitent_id];
           VV.sum += sum;
@@ -484,11 +530,15 @@
       var Asum = 0.0;
       var A_br1 = 0.0;
       var A_br2 = 0.0;
+      var A_br3 = 0.0;
+      var A_br4 = 0.0;
       for(var V of Object.values(lst))
       {
         Asum += V.sum;
         A_br1 += V.br_1;
         A_br2 += V.br_2;
+        A_br3 += V.br_3;
+        A_br4 += V.br_4;
       }
 
       const fmt = new Intl.NumberFormat('ru-RU', { style: 'decimal', maximumFractionDigits:2 });
@@ -497,10 +547,10 @@
       for(var V of Object.values(lst))
       {
         var proc = V.sum / Asum * 100;
-        rows.push([V.name, V.kr, fmt.format(V.sum), proc.toFixed(2), fmt.format(V.br_1), fmt.format(V.br_2)]);
+        rows.push([V.name, V.kr, fmt.format(V.sum), proc.toFixed(2), fmt.format(V.br_1), fmt.format(V.br_2), fmt.format(V.br_3), fmt.format(V.br_4)]);
       }
 
-      rows.push(['==========TOTAL==========', '', fmt.format(Asum), '', fmt.format(A_br1), fmt.format(A_br2)]);
+      rows.push(['==========TOTAL==========', '', fmt.format(Asum), '', fmt.format(A_br1), fmt.format(A_br2), fmt.format(A_br3), fmt.format(A_br4)]);
       await this.load(rows);
     }
 
@@ -976,7 +1026,7 @@
 
     is_bought(secid)
     {
-      for(var b of [1,2]) 
+      for(var b of [1,2,3,4]) 
       {
         for(var acc of [0,1,2])
         {
@@ -1071,6 +1121,7 @@
       const data = this.table.row(el).data();
       const _comm = data[this.iComment]
       const em_id = data[this.iEmID];
+      const secid = data[this.iSecid];
 
       const url = g_emitents_ui.get_URL(em_id);
       DOM.qSel('#checked-dlg #c_comment').value = _comm;
@@ -1527,6 +1578,23 @@
     }
 
   }
+
+  class MyBonds_brok3 extends MyBonds_Table {
+    constructor(table_id, broker_id) 
+    {
+      super("#br_brok3", 3);
+    }
+
+  }
+
+  class MyBonds_brok4 extends MyBonds_Table {
+    constructor(table_id, broker_id) 
+    {
+      super("#br_brok4", 4);
+    }
+
+  }
+
 
   function load_checked_bonds()
   {
