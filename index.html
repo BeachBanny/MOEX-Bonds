@@ -1,0 +1,371 @@
+ <!DOCTYPE html>
+<html>
+<!--
+-->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Облигации</title>
+
+    <link type="text/css" href="css/bootstrap.css" rel="stylesheet" />
+    <link type="text/css" href="css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link type="text/css" href="css/dataTables.bootstrap.min.css" rel="stylesheet" />
+
+    <script type="text/javascript" src="lib/jquery-3.5.1.js"></script>
+    <script type="text/javascript" src="lib/bootstrap.js"></script>
+
+    <script type="text/javascript" src="lib/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="lib/FileSaver.js"></script>
+
+    <script type="text/javascript" src="util.js"></script>
+    <script type="text/javascript" src="index.js"></script>
+
+    <style type="text/css">
+	body { 
+	  margin: 10px;
+	}
+	.ml5 {margin-left:5px}
+	.ml10 {margin-left:10px}
+
+  .p_lbl {
+    width: 100px;
+    text-align: end;
+    padding-right: 10px;
+  }
+  .p_edit {
+    width: 250px;
+  }
+  .data_frm td {
+    padding: 2px 5px 2px 5px;
+  }
+    </style>
+</head>
+
+<body>
+
+  <div>
+    <ul class="nav nav-tabs">
+      <li class="active"> <a href="#tab1" data-toggle="tab">Search</a>  </li>
+      <li> <a href="#tab1_1" data-toggle="tab">Checked</a> </li>
+      <li> <a href="#tab2" data-toggle="tab">Emitents</a> </li>
+      <li> <a href="#tab3" data-toggle="tab">Broker1</a> </li>
+      <li> <a href="#tab4" data-toggle="tab">Broker2</a> </li>
+      <li> <a href="#tab7" data-toggle="tab">Emitent %</a> </li>
+    </ul>
+    <div class="tab-content">
+
+      <div class="tab-pane active" id="tab1">
+        <div style="display:flex; flex-direction:column; font-size: 13px;">
+          <div style="margin-left:60px"> Параметры поиска </div>
+          <div>
+              <label for="c_income_from" class="control-label" style="width:9em; text-align:right">Доходность от:</label>
+              <input type="text" id="c_income_from" style="width:40px" value="8">
+              <label for="c_income_to" class="control-label" style="width:2em; text-align:center">до</label>
+              <input type="text" id="c_income_to" style="width:40px" value="25">
+          </div>
+          <div>
+              <label for="c_price_from" class="control-label" style="width:9em;text-align:right">Цена от:</label>
+              <input type="text" id="c_price_from" style="width:40px" value="92">
+              <label for="c_price_to" class="control-label" style="width:2em; text-align:center">до</label>
+              <input type="text" id="c_price_to" style="width:40px" value="109">
+          </div>
+          <div>
+              <label for="c_duration_from" class="control-label" style="width:9em;text-align:right">Дюрация, мес от:</label>
+              <input type="text" id="c_duration_from" style="width:40px" value="9">
+              <label for="c_duration_to" class="control-label" style="width:2em; text-align:center">до</label>
+              <input type="text" id="c_duration_to" style="width:40px" value="25">
+          </div>
+          <div>
+              <label for="c_count" class="control-label">Количество сделок в каждый из 15 посл дней, шт:</label>
+              <input type="text" id="c_count" style="width:40px" value="30">
+          </div>
+
+          <div style="display:flex; flex-direction:row;" >
+            <button id="run_btn" type="button" class="btn btn-primary" style="width:80px;margin-left:40px;">
+               <img class="hidden" id="run_wait" src="images/throbber.gif" width="16" />
+                Run 
+            </button>
+            <button id="save_btn" type="button" class="btn" style="width:90px;margin-left:40px;">
+                Save CSV
+            </button>
+            <button id="save_emi" type="button" class="btn" style="width:130px;margin-left:40px;">
+              Save Emitents
+            </button>
+            <div style="display:flex;margin-left:10px; align-items: center;">
+              <label class="m-label" style="align-self: end;">Load Emitents:&nbsp;&nbsp;</label>
+              <input type="file" id="emi_data" title="Load Emitents"></input>
+            </div>
+            <button id="save_mybonds" type="button" class="btn" style="width:130px;margin-left:40px;">
+              Save MyBonds
+            </button>
+            <div style="display:flex;margin-left:10px; align-items: center;">
+              <label class="m-label" style="align-self: end;">Load MyBonds:&nbsp;&nbsp;</label>
+              <input type="file" id="mybonds_data" title="Load MyBonds"></input>
+            </div>
+            <button id="save_checked" type="button" class="btn" style="width:130px;margin-left:40px;">
+              Save Checked
+            </button>
+
+          </div>
+
+        </div>
+        <hr>
+        <div>
+           Toggle column: 
+               <a class="bond-toggle-vis" data-column="0">Эмитент</a> 
+             -- <a class="bond-toggle-vis" data-column="1">Board</a> 
+             -- <a class="bond-toggle-vis" data-column="6">Код бумаги</a> 
+             -- <a class="bond-toggle-vis" data-column="16">Купон</a> 
+             -- <a class="bond-toggle-vis" data-column="17">Купоны</a> 
+             <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Double Click for Check Row</span>
+        </div>
+        <table id="bonds" class="display compact table-bordered" width="95%"></table>
+      </div>
+
+
+      <div class="tab-pane" id="tab1_1">
+        <div style="display:flex; margin-top: 20px; flex-direction:column; font-size: 13px;">
+        </div>
+
+        <div>
+           Toggle column: 
+               <a class="checked-toggle-vis" data-column="0">Эмитент</a> 
+             -- <a class="checked-toggle-vis" data-column="1">Board</a> 
+             -- <a class="checked-toggle-vis" data-column="7">Код бумаги</a> 
+        </div>
+        <div style="display:flex; flex-direction:row;" >
+          <button id="checked_refresh" type="button" class="btn btn-primary" style="width:150px;margin-left:40px;">
+            Refresh 
+          </button>
+          <button id="checked_row_del" type="button" class="btn" style="width:150px;margin-left:40px;">
+            Del Selected Row 
+          </button>
+        </div>
+        <table id="bonds_checked" class="display compact table-bordered" width="95%"></table>
+      </div>
+
+
+      <div class="tab-pane" id="tab2">
+        <br>
+        &nbsp;&nbsp;&nbsp;Double click on Row for edit options
+
+        <table id="emitents" class="display compact table-bordered" width="95%" cellspacing="0"></table>
+      </div>
+
+      <div class="tab-pane" id="tab3">
+        <br>
+        <div>
+          Toggle column: 
+          <a class="brok1-toggle-vis" data-column="0">Acc</a> 
+          --<a class="brok1-toggle-vis" data-column="1">Эмитент</a> 
+          --<a class="brok1-toggle-vis" data-column="8">SecID</a> 
+          --<a class="brok1-toggle-vis" data-column="9">Board</a> 
+        </div>
+        <div style="display:flex; flex-direction:row;" >
+          <button id="brok1_row_add" type="button" class="btn" style="width:150px;margin-left:40px;">
+            Add Row 
+          </button>
+          <button id="brok1_row_del" type="button" class="btn" style="width:150px;margin-left:40px;">
+            Del Selected Row 
+          </button>
+          <span>&nbsp;&nbsp;&nbsp;Double click for Edit</span>
+        </div>
+        <table id="br_brok1" class="display compact table-bordered" width="95%" cellspacing="0"></table>
+      </div>
+
+      <div class="tab-pane" id="tab4">
+        <br>
+        <div>
+          Toggle column: 
+              <a class="brok2-toggle-vis" data-column="0">Acc</a> 
+              --<a class="brok2-toggle-vis" data-column="1">Эмитент</a> 
+              --<a class="brok2-toggle-vis" data-column="8">SecID</a> 
+              --<a class="brok2-toggle-vis" data-column="9">Board</a> 
+            </div>
+        <div style="display:flex; flex-direction:row;" >
+          <button id="brok2_row_add" type="button" class="btn" style="width:150px;margin-left:40px;">
+            Add Row 
+          </button>
+          <button id="brok2_row_del" type="button" class="btn" style="width:150px;margin-left:40px;">
+            Del Selected Row 
+          </button>
+          <span>&nbsp;&nbsp;&nbsp;Double click for Edit</span>
+        </div>
+        <table id="br_brok2" class="display compact table-bordered" width="95%" cellspacing="0"></table>
+      </div>
+
+
+      <div class="tab-pane" id="tab7">
+        <br>
+        <table id="tb_proc_emi" class="display compact table-bordered" width="95%" cellspacing="0"></table>
+      </div>
+
+    </div>
+  </div>
+
+
+
+
+<!-- Modal -->
+<div class="modal" id="alert-dlg" tabindex="-1" role="dialog" aria-hidden="true" data-keyboard="false">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Info</h4>
+      </div>
+      <div class="modal-body">
+        <section style="overflow-wrap: break-word;">
+          <p id="alert-msg"></p>
+        </section>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-cancel" type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+        <button id="btn-yes" type="button" class="btn btn-primary">Yes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal Bond Edit-->
+<div class="modal" id="bond-dlg" tabindex="-1" role="dialog" aria-hidden="true" data-keyboard="false">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Bond data</h4>
+      </div>
+      <div class="modal-body">
+        <section style="overflow-wrap: break-word;">
+          <p id="alert-msg-b"></p>
+        </section>
+        <form id="bond_data">
+        <table class="data_frm">
+          <tr>
+            <td class="p_lbl">Acc:</td>
+            <td class="p_edit"> <input type="text" id="b_acc" style="width:20px" value="0"> </td>
+          </tr>
+          <tr>
+            <td class="p_lbl">Id:</td>
+            <td class="p_edit"> <input type="text" id="b_id" style="width:100%" readonly></td>
+          </tr>
+          <tr>
+            <td class="p_lbl">Инструмент:</td>
+            <td class="p_edit"> 
+              <input list="l_bonds" type="text" id="b_bond" style="width:70%"> 
+              <datalist id="l_bonds"></datalist>
+              <button id="btn-check-bond" type="button" class="btn">=></button> 
+            </td>
+          </tr>
+          <tr>
+            <td class="p_lbl"></td>
+            <td class="p_edit">Введите начало наимен потом click на <b>=></b> и СтрелВниз</td>
+          </tr>
+          <tr>
+            <td class="p_lbl">Count:</td>
+            <td class="p_edit"> <input type="text" id="b_count" style="width:100%"> </td>
+          </tr>
+          <tr>
+            <td class="p_lbl">Price%:</td>
+            <td class="p_edit"> <input type="text" id="b_price" style="width:100%"> </td>
+          </tr>
+          <tr>
+            <td class="p_lbl">Дох%-пок:</td>
+            <td class="p_edit"> <input type="text" id="b_income" style="width:100%"> </td>
+          </tr>
+        </table>
+        </form>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-cancel" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button id="btn-ok" type="button" class="btn btn-primary">Ok</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Modal Emitent Edit-->
+<div class="modal" id="emitent-dlg" tabindex="-1" role="dialog" aria-hidden="true" data-keyboard="false">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Emitent KR</h4>
+      </div>
+      <div class="modal-body">
+        <form id="emitent_data">
+        <table class="data_frm">
+          <tr>
+            <td class="p_lbl">KR:</td>
+            <td class="p_edit"> <input type="text" id="e_kr" style="width:100%"> </td>
+          </tr>
+          <tr>
+            <td class="p_lbl">Rating:</td>
+            <td class="p_edit"> <input type="text" id="e_rating" style="width:100%"> </td>
+          </tr>
+          <tr>
+            <td class="p_lbl">URL:</td>
+            <td class="p_edit" style="width:100%"> <input type="text" id="e_url" style="width:100%"> </td>
+          </tr>
+        </table>
+        Multiple URL could be delemited by <b>;</b>
+        </form>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-cancel" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button id="btn-ok" type="button" class="btn btn-primary">Ok</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal CheckedBonds Edit-->
+<div class="modal" id="checked-dlg" tabindex="-1" role="dialog" aria-hidden="true" data-keyboard="false">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Comment</h4>
+      </div>
+      <div class="modal-body">
+        <form id="checked_data">
+        <table class="data_frm">
+          <tr>
+            <td class="p_lbl">Comment:</td>
+            <td class="p_edit" style="width:100%"> <input type="text" id="c_comment" style="width:100%"> </td>
+          </tr>
+          <tr>
+            <td class="p_lbl">URL:</td>
+            <td id="c_url" style="width:100%"> </td>
+          </tr>
+        </table>
+        </form>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-cancel" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button id="btn-ok" type="button" class="btn btn-primary">Ok</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</body>
+
+</html>
