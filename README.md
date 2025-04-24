@@ -1,4 +1,4 @@
-# MOEX-Bonds
+# Скринер Облигаций на базе ISS MOEX
 - Открыть приложение можно по ссылке https://beachbanny.github.io/MOEX-Bonds/
 - Как использовать приложение 
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=N3R0Q7D2kFA" target="_blank">
